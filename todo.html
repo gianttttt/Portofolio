@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Chord Transposer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 p-6 min-h-screen">
+
+  <section class="max-w-xl mx-auto text-center">
+    <h1 class="text-3xl font-bold text-blue-400 mb-6"> Family Chord Transposer</h1>
+
+    <p class="mb-4 text-gray-400">Pilih chord dasar, lalu naikkan atau turunkan nada seperti pada fret gitar.</p>
+
+    <!-- Pilihan chord awal -->
+    <div class="flex justify-center gap-3 mb-6">
+      <select id="chordSelect" 
+              class="border border-gray-600 bg-gray-800 text-gray-100 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="C">C</option>
+        <option value="C#">C#</option>
+        <option value="D">D</option>
+        <option value="D#">D#</option>
+        <option value="E">E</option>
+        <option value="F">F</option>
+        <option value="F#">F#</option>
+        <option value="G">G</option>
+        <option value="G#">G#</option>
+        <option value="A">A</option>
+        <option value="A#">A#</option>
+        <option value="B">B</option>
+      </select>
+    </div>
+
+    <!-- Tombol Transpose -->
+    <div class="flex justify-center gap-4 mb-6">
+      <button onclick="transpose(-1)" 
+              class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+        <
+      </button>
+      <button onclick="transpose(1)" 
+              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+        >
+      </button>
+    </div>
+
+    <!-- Hasil -->
+    <div id="result" class="text-2xl font-bold text-yellow-400">
+      Chord Sekarang: C
+    </div>
+
+    <!-- Link balik -->
+    <a href="index.html" class="inline-block mt-8 text-blue-400 hover:underline">
+      ← Kembali ke Beranda
+    </a>
+  </section>
+
+  <script>
+    const notes = ["C", "C#", "D", "D#", "E", "F", 
+                   "F#", "G", "G#", "A", "A#", "B"];
+
+    let currentIndex = 0; // Default C
+
+    // Update chord awal dari select
+    document.getElementById("chordSelect").addEventListener("change", function() {
+      currentIndex = notes.indexOf(this.value);
+      updateResult();
+    });
+
+    function transpose(step) {
+      currentIndex = (currentIndex + step + notes.length) % notes.length;
+      updateResult();
+    }
+
+    function updateResult() {
+      const result = document.getElementById("result");
+      result.textContent = "Chord Sekarang: " + notes[currentIndex];
+    }
+
+    // Set awal sesuai select
+    updateResult();
+  </script>
+</body>
+</html>

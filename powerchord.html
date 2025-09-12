@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chord Dasar Gitar.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen p-6">
+
+  <main class="max-w-5xl mx-auto">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-yellow-400">Chord Dasar Gitar </h1>
+      <p class="text-gray-300 mt-2">Diagram chord ditampilkan dari kiri ke kanan.</p>
+    </header>
+
+    <div class="flex flex-col sm:flex-row items-center gap-4 justify-center mb-6">
+      <label class="text-gray-300">Pilih chord:</label>
+      <select id="chordSelect"
+              class="border border-gray-600 bg-gray-800 text-gray-100 p-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500">
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="E">E</option>
+        <option value="F">F</option>
+        <option value="G">G</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+      </select>
+    </div>
+
+    <section class="bg-gray-900 bg-opacity-40 p-6 rounded-lg shadow-md">
+      <div class="flex flex-col md:flex-row gap-6 items-start">
+        <div class="flex-1">
+          <div id="svgWrapper" class="mx-auto max-w-full"></div>
+        </div>
+        <aside class="w-full md:w-72 text-gray-300">
+          <h3 class="text-lg font-semibold text-yellow-400 mb-2">Keterangan</h3>
+          <ul class="list-disc pl-5 space-y-2">
+            <li><span class="font-semibold">●</span> = Nada ditekan</li>
+            <li><span class="font-semibold">○</span> = Senar terbuka</li>
+            <li><span class="font-semibold">X</span> = Senar tidak dimainkan</li>
+            <li>Diagram menampilkan fret 1–4.</li>
+            <li>Atas = Senar 6 (E rendah), bawah = Senar 1 (E tinggi).</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="mt-6 text-center text-gray-300">
+      <a href="index.html" class="text-yellow-400 hover:underline">← Kembali ke Beranda</a>
+    </section>
+  </main>
+
+  <script>
+    const chordMap = {
+      "C": [
+        { string: 6, type: "mute" },
+        { string: 5, fret: 3, type: "press" },
+        { string: 4, fret: 2, type: "press" },
+        { string: 3, fret: 0, type: "open" },
+        { string: 2, fret: 1, type: "press" },
+        { string: 1, fret: 0, type: "open" },
+      ],
+      "D": [
+        { string: 6, type: "mute" },
+        { string: 5, type: "mute" },
+        { string: 4, fret: 0, type: "open" },
+        { string: 3, fret: 2, type: "press" },
+        { string: 2, fret: 3, type: "press" },
+        { string: 1, fret: 2, type: "press" },
+      ],
+      "E": [
+        { string: 6, fret: 0, type: "open" },
+        { string: 5, fret: 2, type: "press" },
+        { string: 4, fret: 2, type: "press" },
+        { string: 3, fret: 1, type: "press" },
+        { string: 2, fret: 0, type: "open" },
+        { string: 1, fret: 0, type: "open" },
+      ],
+      "F": [
+        { string: 6, fret: 1, type: "press" },
+        { string: 5, fret: 3, type: "press" },
+        { string: 4, fret: 3, type: "press" },
+        { string: 3, fret: 2, type: "press" },
+        { string: 2, fret: 1, type: "press" },
+        { string: 1, fret: 1, type: "press" },
+      ],
+      "G": [
+        { string: 6, fret: 3, type: "press" },
+        { string: 5, fret: 2, type: "press" },
+        { string: 4, fret: 0, type: "open" },
+        { string: 3, fret: 0, type: "open" },
+        { string: 2, fret: 0, type: "open" },
+        { string: 1, fret: 3, type: "press" },
+      ],
+      "A": [
+        { string: 6, type: "mute" },
+        { string: 5, fret: 0, type: "open" },
+        { string: 4, fret: 2, type: "press" },
+        { string: 3, fret: 2, type: "press" },
+        { string: 2, fret: 2, type: "press" },
+        { string: 1, fret: 0, type: "open" },
+      ],
+      "B": [
+        { string: 6, type: "mute" },
+        { string: 5, fret: 2, type: "press" },
+        { string: 4, fret: 4, type: "press" },
+        { string: 3, fret: 4, type: "press" },
+        { string: 2, fret: 4, type: "press" },
+        { string: 1, fret: 2, type: "press" },
+      ],
+    };
+
+    const svgWrapper = document.getElementById("svgWrapper");
+    const chordSelect = document.getElementById("chordSelect");
+
+    chordSelect.addEventListener("change", () => renderDiagram(chordSelect.value));
+
+    function renderDiagram(chordName) {
+      const positions = chordMap[chordName];
+      const width = 400, height = 200;
+      const topPad = 30, bottomPad = 20;
+      const leftPad = 40, rightPad = 40;
+      const fretCount = 4;
+      const stringCount = 6;
+
+      const boardWidth = width - leftPad - rightPad;
+      const boardHeight = height - topPad - bottomPad;
+      const fretGap = boardWidth / fretCount;
+      const stringGap = boardHeight / (stringCount - 1);
+
+      svgWrapper.innerHTML = "";
+      const ns = "http://www.w3.org/2000/svg";
+      const svg = document.createElementNS(ns, "svg");
+      svg.setAttribute("width", width);
+      svg.setAttribute("height", height);
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+      // Garis fret
+      for (let f = 0; f <= fretCount; f++) {
+        const x = leftPad + f * fretGap;
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", x);
+        line.setAttribute("y1", topPad);
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", topPad + boardHeight);
+        line.setAttribute("stroke", f === 0 ? "#F3F4F6" : "#6B7280");
+        line.setAttribute("stroke-width", f === 0 ? 4 : 1.4);
+        svg.appendChild(line);
+      }
+
+      // Garis senar
+      for (let s = 0; s < stringCount; s++) {
+        const y = topPad + s * stringGap;
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", leftPad);
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", leftPad + boardWidth);
+        line.setAttribute("y2", y);
+        line.setAttribute("stroke", "#D1D5DB");
+        line.setAttribute("stroke-width", 1.5);
+        svg.appendChild(line);
+      }
+
+      // Posisi chord (dibalik: senar 6 di atas, senar 1 di bawah)
+      positions.forEach((pos) => {
+        const y = topPad + (stringCount - pos.string) * stringGap;
+        const x = pos.fret > 0 ? leftPad + (pos.fret - 0.5) * fretGap : leftPad - 10;
+
+        if (pos.type === "mute") {
+          const txt = document.createElementNS(ns, "text");
+          txt.setAttribute("x", leftPad - 20);
+          txt.setAttribute("y", y + 4);
+          txt.setAttribute("fill", "#F87171");
+          txt.setAttribute("font-size", 14);
+          txt.textContent = "X";
+          svg.appendChild(txt);
+        } else if (pos.type === "open") {
+          const txt = document.createElementNS(ns, "text");
+          txt.setAttribute("x", leftPad - 20);
+          txt.setAttribute("y", y + 4);
+          txt.setAttribute("fill", "#FBBF24");
+          txt.setAttribute("font-size", 14);
+          txt.textContent = "○";
+          svg.appendChild(txt);
+        } else if (pos.type === "press") {
+          const circle = document.createElementNS(ns, "circle");
+          circle.setAttribute("cx", x);
+          circle.setAttribute("cy", y);
+          circle.setAttribute("r", 8);
+          circle.setAttribute("fill", "#FBBF24");
+          svg.appendChild(circle);
+        }
+      });
+
+      // Label chord
+      const label = document.createElementNS(ns, "text");
+      label.setAttribute("x", width / 2);
+      label.setAttribute("y", height - 5);
+      label.setAttribute("fill", "#FBBF24");
+      label.setAttribute("font-size", 16);
+      label.setAttribute("text-anchor", "middle");
+      label.textContent = chordName;
+      svg.appendChild(label);
+
+      svgWrapper.appendChild(svg);
+    }
+
+    renderDiagram("C");
+  </script>
+</body>
+</html>
